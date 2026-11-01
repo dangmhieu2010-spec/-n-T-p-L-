@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Kiểm Tra Giữa Học Kỳ I - Môn Vật Lý 11</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- MathJax Configuration & Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f3ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .glass-card { background: #ffffff; border: 1px solid #e2e8f0; }
+        .tab-btn.active { background-color: #4f46e5; color: white; border-color: #4f46e5; }
+        .option-radio:checked + label { border-color: #4f46e5; background-color: #f0f3ff; }
+        .correct-bg { background-color: #dcfce7 !important; border-color: #22c55e !important; }
+        .wrong-bg { background-color: #fee2e2 !important; border-color: #ef4444 !important; }
+        svg text { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Header & Banner (Xóa thông tin thầy Quang & SĐT) -->
+    <header class="bg-gradient-to-r from-brand-900 via-brand-700 to-indigo-600 text-white shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+                    <i class="fa-solid fa-atom text-3xl text-indigo-200"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">ĐỀ KIỂM TRA GIỮA HỌC KỲ I - MÔN VẬT LÝ 11</h1>
+                    <p class="text-xs sm:text-sm text-indigo-200">Ôn tập kiến thức Dao động điều hòa & Năng lượng dao động</p>
+                </div>
+            </div>
+
+            <!-- Score board -->
+            <div class="flex items-center gap-4 bg-white/10 px-5 py-2.5 rounded-2xl border border-white/20">
+                <div class="text-center">
+                    <span class="block text-xs uppercase text-indigo-200 tracking-wider">Điểm Số</span>
+                    <span id="score-display" class="text-2xl font-extrabold text-yellow-300">0.0 / 10</span>
+                </div>
+                <div class="h-8 w-px bg-white/20"></div>
+                <button onclick="checkAllAnswers()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold px-4 py-2 rounded-xl transition shadow-lg text-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-check-double"></i> Nộp Bài & Chấm
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Control bar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap gap-2" id="navigation-tabs">
+                <button onclick="switchTab('part1')" id="tab-part1" class="tab-btn active px-4 py-2 rounded-xl font-semibold text-sm border border-slate-200 transition">
+                    PHẦN I: Trắc Nghiệm (18 câu)
+                </button>
+                <button onclick="switchTab('part2')" id="tab-part2" class="tab-btn px-4 py-2 rounded-xl font-semibold text-sm border border-slate-200 transition">
+                    PHẦN II: Đúng / Sai (4 câu)
+                </button>
+                <button onclick="switchTab('part3')" id="tab-part3" class="tab-btn px-4 py-2 rounded-xl font-semibold text-sm border border-slate-200 transition">
+                    PHẦN III: Trả Lời Ngắn (6 câu)
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSolutions()" id="btn-toggle-sol" class="text-slate-700 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2">
+                    <i class="fa-regular fa-eye"></i> Hiện Lời Giải Chi Tiết
+                </button>
+                <button onclick="resetQuiz()" class="text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> Làm Lại
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+
+        <!-- ================= PHẦN I ================= -->
+        <section id="part1-section" class="space-y-6">
+            <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-xl">
+                <h2 class="font-bold text-indigo-900 text-lg">PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn (18 Câu)</h2>
+                <p class="text-sm text-indigo-700">Mỗi câu chọn 1 phương án đúng duy nhất. (0.25đ / câu)</p>
+            </div>
+
+            <div id="part1-questions" class="space-y-6"></div>
+        </section>
+
+        <!-- ================= PHẦN II ================= -->
+        <section id="part2-section" class="space-y-6 hidden">
+            <div class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-xl">
+                <h2 class="font-bold text-amber-900 text-lg">PHẦN II. Câu trắc nghiệm Đúng / Sai (4 Câu)</h2>
+                <p class="text-sm text-amber-700">Trong mỗi ý a), b), c), d) ở mỗi câu, chọn Đúng (Đ) hoặc Sai (S).</p>
+            </div>
+
+            <div id="part2-questions" class="space-y-6"></div>
+        </section>
+
+        <!-- ================= PHẦN III ================= -->
+        <section id="part3-section" class="space-y-6 hidden">
+            <div class="bg-emerald-50 border-l-4 border-emerald-600 p-4 rounded-r-xl">
+                <h2 class="font-bold text-emerald-900 text-lg">PHẦN III. Câu trắc nghiệm trả lời ngắn (6 Câu)</h2>
+                <p class="text-sm text-emerald-700">Điền kết quả dạng số hoặc số thập phân vào ô trống.</p>
+            </div>
+
+            <div id="part3-questions" class="space-y-6"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 bg-slate-900 text-slate-400 py-8 text-center text-sm border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-semibold text-slate-200">ĐỀ THI ÔN TẬP VẬT LÝ 11 - GIỮA HỌC KỲ I</p>
+            <p class="mt-1 text-xs text-slate-500">Hệ thống làm bài trực tuyến tự động chấm điểm & render công thức chuẩn MathJax</p>
+        </div>
+    </footer>
+
+    <!-- JS DATABASE & APP LOGIC -->
+    <script>
+        // SVG Vector Graphic Components Generator
+        const SVGAssets = {
+            graphSinWave: `
+                <div class="my-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+                    <p class="text-xs font-semibold text-slate-500 mb-2">Đồ thị 1: Dao động điều hòa x(t)</p>
+                    <svg viewBox="0 0 500 240" class="w-full max-w-lg h-auto">
+                        <line x1="50" y1="120" x2="460" y2="120" stroke="#334155" stroke-width="2"/>
+                        <line x1="100" y1="220" x2="100" y2="20" stroke="#334155" stroke-width="2"/>
+                        
+                        <text x="465" y="125" fill="#0f172a" font-size="13" font-weight="bold">t(s)</text>
+                        <text x="75" y="25" fill="#0f172a" font-size="13" font-weight="bold">x(cm)</text>
+                        <text x="85" y="135" fill="#64748b" font-size="12">O</text>
+
+                        <line x1="95" y1="40" x2="105" y2="40" stroke="#334155" stroke-width="2"/>
+                        <text x="70" y="44" fill="#0f172a" font-size="13" font-weight="bold">10</text>
+                        
+                        <line x1="95" y1="200" x2="105" y2="200" stroke="#334155" stroke-width="2"/>
+                        <text x="65" y="204" fill="#0f172a" font-size="13" font-weight="bold">-10</text>
+
+                        <line x1="100" y1="40" x2="420" y2="40" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4"/>
+                        <line x1="100" y1="200" x2="420" y2="200" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4"/>
+                        
+                        <path d="M 100 40 Q 145 40 190 120 T 280 200 T 370 120 T 460 40" fill="none" stroke="#4f46e5" stroke-width="3"/>
+                        
+                        <line x1="190" y1="115" x2="190" y2="125" stroke="#334155" stroke-width="2"/>
+                        <text x="180" y="145" fill="#0f172a" font-size="12" font-weight="bold">1/4</text>
+                    </svg>
+                </div>
+            `,
+            graphTwoWaves: `
+                <div class="my-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+                    <p class="text-xs font-semibold text-slate-500 mb-2">Đồ thị 2: Đồ thị hai dao động x₁(t) và x₂(t)</p>
+                    <svg viewBox="0 0 500 220" class="w-full max-w-lg h-auto">
+                        <line x1="50" y1="110" x2="460" y2="110" stroke="#334155" stroke-width="2"/>
+                        <line x1="80" y1="200" x2="80" y2="20" stroke="#334155" stroke-width="2"/>
+                        <text x="465" y="115" fill="#0f172a" font-size="13">t(s)</text>
+                        <text x="60" y="25" fill="#0f172a" font-size="13">x(cm)</text>
+                        <text x="68" y="125" fill="#64748b" font-size="12">O</text>
+
+                        <path d="M 80 110 Q 120 30 160 110 T 240 110 T 320 110 T 400 110" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+                        <path d="M 80 30 Q 120 110 160 190 T 240 110 T 320 30 T 400 190" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-dasharray="6,3"/>
+
+                        <text x="170" y="45" fill="#ef4444" font-size="12" font-weight="bold">(1)</text>
+                        <text x="130" y="175" fill="#4f46e5" font-size="12" font-weight="bold">(2)</text>
+                    </svg>
+                </div>
+            `,
+            graphKineticEnergy: `
+                <div class="my-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+                    <p class="text-xs font-semibold text-slate-500 mb-2">Đồ thị 3: Động năng Wd(J) theo thời gian t(s)</p>
+                    <svg viewBox="0 0 500 240" class="w-full max-w-lg h-auto">
+                        <line x1="50" y1="200" x2="460" y2="200" stroke="#334155" stroke-width="2"/>
+                        <line x1="80" y1="220" x2="80" y2="20" stroke="#334155" stroke-width="2"/>
+                        <text x="465" y="205" fill="#0f172a" font-size="13" font-weight="bold">t(s)</text>
+                        <text x="45" y="25" fill="#0f172a" font-size="13" font-weight="bold">Wd(J)</text>
+
+                        <line x1="80" y1="60" x2="420" y2="60" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4,4"/>
+                        <text x="45" y="65" fill="#0f172a" font-size="13" font-weight="bold">0,5</text>
+
+                        <path d="M 80 200 Q 130 60 180 200 T 280 200 T 380 200" fill="none" stroke="#16a34a" stroke-width="3"/>
+
+                        <line x1="280" y1="195" x2="280" y2="205" stroke="#334155" stroke-width="2"/>
+                        <text x="260" y="225" fill="#0f172a" font-size="12" font-weight="bold">7π/60</text>
+                    </svg>
+                </div>
+            `,
+            graphWdvsX2: `
+                <div class="my-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+                    <p class="text-xs font-semibold text-slate-500 mb-2">Đồ thị 4: Biểu diễn Wd theo x²</p>
+                    <svg viewBox="0 0 400 220" class="w-full max-w-md h-auto">
+                        <line x1="60" y1="180" x2="360" y2="180" stroke="#334155" stroke-width="2"/>
+                        <line x1="80" y1="200" x2="80" y2="30" stroke="#334155" stroke-width="2"/>
+                        <text x="330" y="200" fill="#0f172a" font-size="13" font-weight="bold">x²(cm²)</text>
+                        <text x="35" y="35" fill="#0f172a" font-size="13" font-weight="bold">Wd(J)</text>
+                        <text x="68" y="195" fill="#64748b" font-size="12">O</text>
+
+                        <line x1="80" y1="60" x2="300" y2="180" stroke="#7c3aed" stroke-width="3"/>
+                        
+                        <circle cx="80" cy="60" r="4" fill="#7c3aed"/>
+                        <text x="40" y="65" fill="#0f172a" font-size="12" font-weight="bold">0,08</text>
+
+                        <circle cx="300" cy="180" r="4" fill="#7c3aed"/>
+                        <text x="295" y="200" fill="#0f172a" font-size="12" font-weight="bold">16</text>
+                    </svg>
+                </div>
+            `,
+            graphOscillationShort: `
+                <div class="my-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+                    <p class="text-xs font-semibold text-slate-500 mb-2">Đồ thị 5: Đồ thị dao động điều hòa</p>
+                    <svg viewBox="0 0 450 180" class="w-full max-w-md h-auto">
+                        <line x1="40" y1="90" x2="410" y2="90" stroke="#334155" stroke-width="2"/>
+                        <line x1="70" y1="160" x2="70" y2="20" stroke="#334155" stroke-width="2"/>
+                        <text x="415" y="95" fill="#0f172a" font-size="12">t(s)</text>
+                        <text x="50" y="25" fill="#0f172a" font-size="12">x(cm)</text>
+                        
+                        <path d="M 70 90 Q 110 20 150 90 T 230 90 T 310 90 T 390 90" fill="none" stroke="#059669" stroke-width="2.5"/>
+                    </svg>
+                </div>
+            `
+        };
+
+        // DATASETS WITH MATHJAX FORMAT
+        const part1Data = [
+            {
+                id: 1,
+                question: "Vật dao động trên quỹ đạo dài 10 cm, chu kỳ $T = 0,25\\text{ s}$. Viết phương trình dao động của vật biết tại $t = 0$, vật đi qua vị trí cân bằng theo chiều dương?",
+                options: [
+                    "$x = 10\\cos\\left(4\\pi t + \\frac{\\pi}{2}\\right)\\text{ cm}$",
+                    "$x = 5\\cos\\left(8\\pi t - \\frac{\\pi}{2}\\right)\\text{ cm}$",
+                    "$x = 10\\cos\\left(8\\pi t + \\frac{\\pi}{2}\\right)\\text{ cm}$",
+                    "$x = 20\\cos\\left(8\\pi t - \\frac{\\pi}{2}\\right)\\text{ cm}$"
+                ],
+                correct: 1,
+                solution: "Quỹ đạo $L = 2A = 10\\text{ cm} \\Rightarrow A = 5\\text{ cm}$.<br>$\\omega = \\frac{2\\pi}{T} = \\frac{2\\pi}{0,25} = 8\\pi\\text{ rad/s}$.<br>Tại $t = 0$: qua VTCB theo chiều dương $\\Rightarrow \\varphi = -\\frac{\\pi}{2}$.<br>Phương trình: $x = 5\\cos\\left(8\\pi t - \\frac{\\pi}{2}\\right)\\text{ cm}$."
+            },
+            {
+                id: 2,
+                question: "Một vật dao động điều hòa dọc theo trục Ox quanh VTCB O theo phương trình $x = 3\\cos\\left(2\\pi t - \\frac{\\pi}{3}\\right)\\text{ cm}$. Tại thời điểm $t = 0$, trạng thái chuyển động của vật là:",
+                options: [
+                    "Li độ $x = -1,5\\text{ cm}$ và chuyển động theo chiều dương.",
+                    "Li độ $x = 1,5\\text{ cm}$ và chuyển động ngược chiều dương.",
+                    "Li độ $x = 1,5\\text{ cm}$ và chuyển động theo chiều dương.",
+                    "Li độ $x = -1,5\\text{ cm}$ và chuyển động ngược chiều dương."
+                ],
+                correct: 2,
+                solution: "Tại $t = 0$: $x = 3\\cos\\left(-\\frac{\\pi}{3}\\right) = 1,5\\text{ cm}$. Do $\\varphi = -\\frac{\\pi}{3} < 0$ nên vật chuyển động theo chiều dương."
+            },
+            {
+                id: 3,
+                question: "Một vật dao động có vận tốc $v = 4\\pi \\cos\\left(2\\pi t - \\frac{\\pi}{3}\\right)\\text{ cm/s}$. Khi đó vật có:",
+                options: [
+                    "Biên độ 4 cm.",
+                    "Tần số $\\pi\\text{ Hz}$.",
+                    "Gia tốc cực đại $8\\pi^2\\text{ cm/s}^2$.",
+                    "Chu kỳ 2 s."
+                ],
+                correct: 2,
+                solution: "$v_{max} = \\omega A = 4\\pi\\text{ cm/s}$ với $\\omega = 2\\pi\\text{ rad/s} \\Rightarrow A = 2\\text{ cm}$.<br>Gia tốc cực đại $a_{max} = \\omega^2 A = (2\\pi)^2 \\cdot 2 = 8\\pi^2\\text{ cm/s}^2$."
+            },
+            {
+                id: 4,
+                question: "Một vật nhỏ dao động điều hòa có phương trình $x = 10\\cos\\left(2\\pi t + \\frac{\\pi}{2}\\right)\\text{ cm}$. Phát biểu nào sau đây là **SAI**?",
+                options: [
+                    "Biên độ dao động của vật là 10 cm.",
+                    "Tần số dao động $f = 1\\text{ Hz}$.",
+                    "Pha ban đầu của dao động là $2\\pi t + \\frac{\\pi}{2}$.",
+                    "Tốc độ vật khi qua vị trí cân bằng là $20\\pi\\text{ cm/s}$."
+                ],
+                correct: 2,
+                solution: "Pha ban đầu là $\\varphi = \\frac{\\pi}{2}\\text{ rad}$. Cụm $\\left(2\\pi t + \\frac{\\pi}{2}\\right)$ là **pha dao động**, không phải pha ban đầu."
+            },
+            {
+                id: 5,
+                question: "Phương trình dao động $x = A\\cos(\\omega t + \\varphi)\\text{ cm}$. Gia tốc của vật có độ lớn cực đại là:",
+                options: [
+                    "$\\omega^2 A$",
+                    "$\\omega A$",
+                    "$-\\omega^2 A$",
+                    "$\\omega A^2$"
+                ],
+                correct: 0,
+                solution: "Độ lớn gia tốc cực đại $|a|_{max} = \\omega^2 A$."
+            },
+            {
+                id: 6,
+                question: "Vật dao động với $x = 10\\cos\\left(\\pi t + \\frac{\\pi}{3}\\right)\\text{ cm}$. Lấy $\\pi^2 = 10$, gia tốc tức thời có biểu thức:",
+                options: [
+                    "$a = 100\\cos\\left(\\pi t + \\frac{\\pi}{3}\\right)\\text{ cm/s}^2$",
+                    "$a = -100\\sin\\left(\\pi t + \\frac{\\pi}{3}\\right)\\text{ cm/s}^2$",
+                    "$a = -100\\cos\\left(\\pi t + \\frac{\\pi}{3}\\right)\\text{ cm/s}^2$",
+                    "$a = 10\\pi\\cos\\left(\\pi t + \\frac{\\pi}{3}\\right)\\text{ cm/s}^2$"
+                ],
+                correct: 2,
+                solution: "$a = -\\omega^2 x = -\\pi^2 \\cdot 10 \\cos\\left(\\pi t + \\frac{\\pi}{3}\\right) = -100\\cos\\left(\\pi t + \\frac{\\pi}{3}\\right)\\text{ cm/s}^2$."
+            },
+            {
+                id: 7,
+                question: "Vận tốc cực đại $v_{max} = 8\\pi\\text{ cm/s}$ và gia tốc cực đại $a_{max} = 16\\pi^2\\text{ cm/s}^2$. Chu kì dao động là:",
+                options: [
+                    "1 s.",
+                    "0,5 s.",
+                    "2 s.",
+                    "4 s."
+                ],
+                correct: 0,
+                solution: "$\\omega = \\frac{a_{max}}{v_{max}} = 2\\pi\\text{ rad/s} \\Rightarrow T = \\frac{2\\pi}{\\omega} = 1\\text{ s}$."
+            },
+            {
+                id: 8,
+                question: "Khi vận tốc vật có độ lớn bằng một nửa vận tốc cực đại, li độ có độ lớn bằng:",
+                options: [
+                    "$\\frac{A\\sqrt{3}}{2}$",
+                    "$\\frac{A}{2}$",
+                    "$\\frac{A\\sqrt{3}}{4}$",
+                    "$\\frac{A}{4}$"
+                ],
+                correct: 0,
+                solution: "$\\left(\\frac{x}{A}\\right)^2 + \\left(\\frac{v}{v_{max}}\\right)^2 = 1 \\Rightarrow \\left(\\frac{x}{A}\\right)^2 + \\left(\\frac{1}{2}\\right)^2 = 1 \\Rightarrow |x| = \\frac{A\\sqrt{3}}{2}$."
+            },
+            {
+                id: 9,
+                question: "Hai dao động $x_1$ và $x_2$ có đồ thị như hình vẽ bên. Độ lệch pha của hai dao động này là:",
+                hasImage: 'graphTwoWaves',
+                options: [
+                    "$\\frac{\\pi}{2}\\text{ rad}$",
+                    "$\\frac{\\pi}{4}\\text{ rad}$",
+                    "$\\pi\\text{ rad}$",
+                    "$0\\text{ rad}$"
+                ],
+                correct: 0,
+                solution: "Từ đồ thị, khi $x_1$ cực đại thì $x_2$ qua VTCB. Hai dao động vuông pha nhau nên độ lệch pha là $\\frac{\\pi}{2}$ rad."
+            },
+            {
+                id: 10,
+                question: "Con lắc đơn $l = 1,2\\text{ m}$, kéo góc $20^\\circ$ rồi thả nhẹ. Lấy $g = 9,8\\text{ m/s}^2$. Tốc độ qua VTCB là:",
+                options: [
+                    "1,41 m/s.",
+                    "1,28 m/s.",
+                    "1,57 m/s.",
+                    "1,19 m/s."
+                ],
+                correct: 3,
+                solution: "$v_{max} = \\sqrt{2gl(1 - \\cos\\alpha_0)} = \\sqrt{2 \\cdot 9,8 \\cdot 1,2 \\cdot (1 - \\cos 20^\\circ)} \\approx 1,19\\text{ m/s}$."
+            },
+            {
+                id: 11,
+                question: "Con lắc lò xo treo thẳng đứng dao động với chiều dài biến thiên từ 20 cm đến 28 cm. Chiều dài VTCB và biên độ là:",
+                options: [
+                    "22 cm và 8 cm.",
+                    "24 cm và 4 cm.",
+                    "24 cm và 8 cm.",
+                    "20 cm và 4 cm."
+                ],
+                correct: 1,
+                solution: "$A = \\frac{28 - 20}{2} = 4\\text{ cm}$; $l_{cb} = \\frac{28 + 20}{2} = 24\\text{ cm}$."
+            },
+            {
+                id: 12,
+                question: "Chất điểm chuyển động từ vị trí biên về vị trí cân bằng thì:",
+                options: [
+                    "Động năng giảm, thế năng tăng.",
+                    "Động năng tăng, thế năng tăng.",
+                    "Động năng tăng, thế năng giảm.",
+                    "Động năng giảm, thế năng giảm."
+                ],
+                correct: 2,
+                solution: "Từ biên về VTCB: Tốc độ tăng nên động năng tăng, độ lớn li độ giảm nên thế năng giảm."
+            },
+            {
+                id: 13,
+                question: "Khi thế năng bằng $1/3$ lần động năng thì vận tốc vật có độ lớn:",
+                options: [
+                    "$v = 2\\omega A$",
+                    "$v = \\omega A$",
+                    "$v = 0,5\\omega A$",
+                    "$v = \\frac{\\omega A \\sqrt{3}}{2}$"
+                ],
+                correct: 3,
+                solution: "$W_t = \\frac{1}{3}W_d \\Rightarrow W_d = \\frac{3}{4}W \\Rightarrow v = \\frac{\\omega A\\sqrt{3}}{2}$."
+            },
+            {
+                id: 14,
+                question: "Con lắc lò xo treo thẳng đứng ($m = 200\\text{g}$). Khi $x = 4\\text{ cm}$ thì $v = 0$ và lò xo không biến dạng. Động năng tại $x = 2\\text{ cm}$ là:",
+                options: [
+                    "0,04 J.",
+                    "0,01 J.",
+                    "0,02 J.",
+                    "0,03 J."
+                ],
+                correct: 3,
+                solution: "$A = 4\\text{ cm} = 0,04\\text{ m} = \\Delta l_0 \\Rightarrow \\omega = \\sqrt{\\frac{g}{\\Delta l_0}} = 5\\sqrt{10}\\text{ rad/s}$.<br>$W_d = \\frac{1}{2}m\\omega^2(A^2 - x^2) = 0,03\\text{ J}$."
+            },
+            {
+                id: 15,
+                question: "Con lắc đơn có chu kỳ 2 s. Chu kỳ dao động không đổi khi thay đổi yếu tố nào?",
+                options: [
+                    "Khối lượng quả nặng m.",
+                    "Chiều dài dây treo l.",
+                    "Gia tốc trọng trường g.",
+                    "Vị trí địa lý."
+                ],
+                correct: 0,
+                solution: "Chu kỳ con lắc đơn $T = 2\\pi\\sqrt{\\frac{l}{g}}$ không phụ thuộc vào khối lượng m."
+            },
+            {
+                id: 16,
+                question: "Bộ phận đóng cửa tự động là ứng dụng của:",
+                options: [
+                    "Dao động tắt dần.",
+                    "Cộng hưởng dao động.",
+                    "Tự dao động.",
+                    "Dao động cưỡng bức."
+                ],
+                correct: 0,
+                solution: "Bộ phận đóng cửa tự động ứng dụng hiện tượng dao động tắt dần."
+            },
+            {
+                id: 17,
+                question: "Phát biểu nào sau đây về dao động cưỡng bức là **SAI**?",
+                options: [
+                    "Tần số bằng tần số ngoại lực.",
+                    "Biên độ là tần số riêng của hệ.",
+                    "Biên độ phụ thuộc vào biên độ ngoại lực.",
+                    "Biên độ phụ thuộc độ chênh lệch tần số."
+                ],
+                correct: 1,
+                solution: "Phát biểu B sai vì biên độ dao động cưỡng bức không phải là tần số riêng."
+            },
+            {
+                id: 18,
+                question: "Vật dao động $x = 4\\cos\\left(2\\pi t + \\frac{\\pi}{6}\\right)\\text{ cm}$. Thời gian ngắn nhất đi từ $x = -2\\text{ cm}$ đến $x = 2\\sqrt{3}\\text{ cm}$ là:",
+                hasImage: 'graphSinWave',
+                options: [
+                    "1/16 s.",
+                    "7/6 s.",
+                    "1/10 s.",
+                    "1/4 s."
+                ],
+                correct: 3,
+                solution: "$x_1 = -2 = -A/2$, $x_2 = 2\\sqrt{3} = A\\sqrt{3}/2$.<br>Góc quay $\\Delta \\varphi = \\frac{\\pi}{6} + \\frac{\\pi}{3} = \\frac{\\pi}{2} \\Rightarrow \\Delta t = \\frac{1}{4}\\text{ s}$."
+            }
+        ];
+
+        const part2Data = [
+            {
+                id: 1,
+                title: "Câu 1. Vật nhỏ dao động điều hòa có đồ thị li độ - thời gian như hình vẽ:",
+                hasImage: 'graphSinWave',
+                statements: [
+                    { key: 'a', text: "Biên độ dao động của vật là 10 cm.", correct: true, sol: "Đúng. Giá trị đỉnh cực đại của đồ thị là 10 cm." },
+                    { key: 'b', text: "Tần số góc của dao động là $4\\pi\\text{ rad/s}$.", correct: false, sol: "Sai. Chu kỳ T = 1s nên tần số góc là $2\\pi\\text{ rad/s}$." },
+                    { key: 'c', text: "Phương trình dao động $x = 10\\cos(4\\pi t + \\pi)\\text{ cm}$.", correct: false, sol: "Sai. Phương trình chuẩn là $x = 10\\cos(2\\pi t)\\text{ cm}$." },
+                    { key: 'd', text: "Thời gian vật đi quãng đường 95 cm kể từ t = 0 là 7/3 s.", correct: true, sol: "Đúng." }
+                ]
+            },
+            {
+                id: 2,
+                title: "Câu 2. Con lắc lò xo $m = 100\\text{g}, k = 100\\text{ N/m}$ chịu ngoại lực cưỡng bức $F = F_0\\cos(\\omega t)$.",
+                statements: [
+                    { key: 'a', text: "Biên độ dao động cưỡng bức tăng rồi giảm khi tần số ngoại lực tăng liên tục.", correct: true, sol: "Đúng." },
+                    { key: 'b', text: "Tần số dao động riêng $f_0 \\approx 5\\text{ Hz}$.", correct: true, sol: "Đúng. $f_0 = \\frac{1}{2\\pi}\\sqrt{\\frac{k}{m}} \\approx 5\\text{ Hz}$." },
+                    { key: 'c', text: "Do $t_2 > t_1$ nên biên độ $A_2 > A_1$.", correct: false, sol: "Sai." },
+                    { key: 'd', text: "Biên độ không đổi khi thay đổi tần số ngoại lực.", correct: false, sol: "Sai." }
+                ]
+            },
+            {
+                id: 3,
+                title: "Câu 3. Con lắc lò xo thẳng đứng $k = 100\\text{ N/m}, m = 100\\text{g}$.",
+                statements: [
+                    { key: 'a', text: "Cơ năng của hệ là 0,02 J.", correct: true, sol: "Đúng." },
+                    { key: 'b', text: "Động năng khi qua vị trí lò xo không biến dạng là 0,01 J.", correct: true, sol: "Đúng." },
+                    { key: 'c', text: "Thế năng khi qua vị trí cân bằng là 0,02 J.", correct: false, sol: "Sai. Tại VTCB thế năng bằng 0." },
+                    { key: 'd', text: "Thế năng đàn hồi cực đại là 0,045 J.", correct: true, sol: "Đúng." }
+                ]
+            },
+            {
+                id: 4,
+                title: "Câu 4. Vật $m = 250\\text{g}$ có đồ thị động năng theo thời gian như hình vẽ:",
+                hasImage: 'graphKineticEnergy',
+                statements: [
+                    { key: 'a', text: "Cơ năng của vật là 0,625 J.", correct: false, sol: "Sai. Cơ năng bằng động năng cực đại W = 0,5 J." },
+                    { key: 'b', text: "Tần số góc của dao động là $10\\text{ rad/s}$.", correct: true, sol: "Đúng. Từ đồ thị suy ra T = 0,2s => omega = 10 rad/s." },
+                    { key: 'c', text: "Biên độ dao động của vật là 20 cm.", correct: false, sol: "Sai. $A = 20\\text{ cm} = 0,2\\text{ m}$." },
+                    { key: 'd', text: "Khi $W_d = 3W_t$ thì gia tốc có độ lớn $10\\text{ m/s}^2$.", correct: true, sol: "Đúng." }
+                ]
+            }
+        ];
+
+        const part3Data = [
+            {
+                id: 1,
+                question: "Câu 1. Độ lệch pha của hai dao động cùng tần số ở hình vẽ là bao nhiêu rad? (Làm tròn 2 chữ số thập phân)",
+                answer: "1.05",
+                solution: "$\\Delta \\varphi = \\frac{2\\pi}{6} = \\frac{\\pi}{3} \\approx 1,05\\text{ rad}$."
+            },
+            {
+                id: 2,
+                question: "Câu 2. Trong 1 phút vật thực hiện 30 dao động. Quãng đường đi trong 6s là 48 cm. Biên độ dao động là bao nhiêu cm?",
+                hasImage: 'graphOscillationShort',
+                answer: "4",
+                solution: "$T = 2\\text{ s} \\Rightarrow t = 6\\text{ s} = 3T \\Rightarrow S = 12A = 48\\text{ cm} \\Rightarrow A = 4\\text{ cm}$."
+            },
+            {
+                id: 3,
+                question: "Câu 3. Cho phương trình $x = 10\\cos\\left(\\omega t + \\frac{\\pi}{3}\\right)\\text{ cm}$. Biên độ dao động tính theo mét là bao nhiêu?",
+                answer: "0.1",
+                solution: "$A = 10\\text{ cm} = 0,1\\text{ m}$."
+            },
+            {
+                id: 4,
+                question: "Câu 4. Vật dao động $x = 6\\cos(2\\pi t)\\text{ cm}$. Thời điểm qua vị trí tốc độ $6\\pi\\text{ cm/s}$ lần thứ 2026 là bao nhiêu giây?",
+                answer: "1012.75",
+                solution: "$v = v_{max}/2 \\Rightarrow t = 506T + 0,75 = 1012,75\\text{ s}$."
+            },
+            {
+                id: 5,
+                question: "Câu 5. Khi $x = 2\\text{ cm}$ thì $W_d = 0,48\\text{ J}$. Khi $x = 6\\text{ cm}$ thì $W_d = 0,32\\text{ J}$. Biên độ dao động là bao nhiêu cm?",
+                answer: "10",
+                solution: "Lập hệ phương trình năng lượng thu được $A = 10\\text{ cm}$."
+            },
+            {
+                id: 6,
+                question: "Câu 6. Vật $m = 0,1\\text{ kg}$ có đồ thị $W_d$ theo $x^2$ như hình vẽ. Tốc độ trung bình trong 1 chu kỳ là bao nhiêu cm/s?",
+                hasImage: 'graphWdvsX2',
+                answer: "40",
+                solution: "$W_{max} = 0,08\\text{ J}$, $A^2 = 16 \\Rightarrow A = 4\\text{ cm}$. $v_{tb} = \\frac{4A}{T} = 40\\text{ cm/s}$."
+            }
+        ];
+
+        // RENDER & RE-MATHJAX
+        function renderAll() {
+            renderPart1();
+            renderPart2();
+            renderPart3();
+            triggerMathJax();
+        }
+
+        function triggerMathJax() {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+        }
+
+        function renderPart1() {
+            const container = document.getElementById('part1-questions');
+            container.innerHTML = part1Data.map((q) => `
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-start gap-3">
+                        <span class="bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Câu ${q.id}</span>
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-800 text-base leading-relaxed">${q.question}</p>
+                            ${q.hasImage && SVGAssets[q.hasImage] ? SVGAssets[q.hasImage] : ''}
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                                ${q.options.map((opt, optIdx) => `
+                                    <div class="relative">
+                                        <input type="radio" id="p1_q${q.id}_o${optIdx}" name="p1_q${q.id}" value="${optIdx}" class="option-radio hidden" onchange="calculateScore()">
+                                        <label for="p1_q${q.id}_o${optIdx}" class="flex items-center p-3.5 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition text-sm text-slate-700">
+                                            <span class="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center font-bold text-xs mr-3 text-slate-500">${String.fromCharCode(65 + optIdx)}</span>
+                                            <div>${opt}</div>
+                                        </label>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div id="sol-p1-${q.id}" class="solution-box hidden mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-sm text-indigo-900">
+                                <p class="font-bold mb-1"><i class="fa-solid fa-lightbulb text-amber-500"></i> Lời giải chi tiết:</p>
+                                <div>${q.solution}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPart2() {
+            const container = document.getElementById('part2-questions');
+            container.innerHTML = part2Data.map((q) => `
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 text-base mb-2">${q.title}</h3>
+                    ${q.hasImage && SVGAssets[q.hasImage] ? SVGAssets[q.hasImage] : ''}
+                    
+                    <div class="space-y-3 mt-4">
+                        ${q.statements.map((st) => `
+                            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="text-sm text-slate-700 font-medium">
+                                    <span class="font-bold text-brand-600">${st.key})</span> ${st.text}
+                                </div>
+                                <div class="flex items-center gap-4 shrink-0">
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-sm font-semibold text-emerald-700">
+                                        <input type="radio" name="p2_q${q.id}_${st.key}" value="true" class="form-radio text-emerald-600" onchange="calculateScore()"> Đúng
+                                    </label>
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-sm font-semibold text-rose-700">
+                                        <input type="radio" name="p2_q${q.id}_${st.key}" value="false" class="form-radio text-rose-600" onchange="calculateScore()"> Sai
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="sol-p2-${q.id}-${st.key}" class="solution-box hidden ml-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
+                                <b>Giải thích (${st.key}):</b> ${st.sol}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPart3() {
+            const container = document.getElementById('part3-questions');
+            container.innerHTML = part3Data.map((q) => `
+                <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <p class="font-semibold text-slate-800 text-base leading-relaxed">${q.question}</p>
+                    ${q.hasImage && SVGAssets[q.hasImage] ? SVGAssets[q.hasImage] : ''}
+                    
+                    <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <input type="text" id="p3_q${q.id}" placeholder="Nhập đáp số..." class="px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-brand-600 text-sm font-semibold text-slate-800 sm:w-64">
+                        <button onclick="checkPart3Single(${q.id})" class="bg-slate-800 hover:bg-slate-900 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition">
+                            Kiểm tra
+                        </button>
+                    </div>
+
+                    <div id="sol-p3-${q.id}" class="solution-box hidden mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-900">
+                        <p class="font-bold mb-1">Đáp án đúng: <span class="text-rose-600 font-extrabold">${q.answer}</span></p>
+                        <p class="font-bold mb-1"><i class="fa-solid fa-calculator"></i> Lời giải:</p>
+                        <div>${q.solution}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tabId) {
+            ['part1', 'part2', 'part3'].forEach(id => {
+                document.getElementById(`${id}-section`).classList.add('hidden');
+                document.getElementById(`tab-${id}`).classList.remove('active');
+            });
+
+            document.getElementById(`${tabId}-section`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        }
+
+        let showSol = false;
+        function toggleSolutions() {
+            showSol = !showSol;
+            document.querySelectorAll('.solution-box').forEach(box => {
+                if (showSol) box.classList.remove('hidden');
+                else box.classList.add('hidden');
+            });
+
+            const btn = document.getElementById('btn-toggle-sol');
+            btn.innerHTML = showSol 
+                ? `<i class="fa-regular fa-eye-slash"></i> Ẩn Lời Giải Chi Tiết`
+                : `<i class="fa-regular fa-eye"></i> Hiện Lời Giải Chi Tiết`;
+            
+            triggerMathJax();
+        }
+
+        function calculateScore() {
+            let totalScore = 0;
+
+            part1Data.forEach(q => {
+                const selected = document.querySelector(`input[name="p1_q${q.id}"]:checked`);
+                if (selected && parseInt(selected.value) === q.correct) {
+                    totalScore += 0.25;
+                }
+            });
+
+            part2Data.forEach(q => {
+                let correctCount = 0;
+                q.statements.forEach(st => {
+                    const selected = document.querySelector(`input[name="p2_q${q.id}_${st.key}"]:checked`);
+                    if (selected && (selected.value === 'true') === st.correct) {
+                        correctCount++;
+                    }
+                });
+                if (correctCount === 1) totalScore += 0.1;
+                else if (correctCount === 2) totalScore += 0.25;
+                else if (correctCount === 3) totalScore += 0.5;
+                else if (correctCount === 4) totalScore += 1.0;
+            });
+
+            part3Data.forEach(q => {
+                const input = document.getElementById(`p3_q${q.id}`);
+                if (input && input.value.trim() === q.answer) {
+                    totalScore += 0.25;
+                }
+            });
+
+            document.getElementById('score-display').innerText = `${totalScore.toFixed(2)} / 10`;
+        }
+
+        function checkPart3Single(id) {
+            const solBox = document.getElementById(`sol-p3-${id}`);
+            if (solBox) solBox.classList.remove('hidden');
+            calculateScore();
+            triggerMathJax();
+        }
+
+        function checkAllAnswers() {
+            part1Data.forEach(q => {
+                q.options.forEach((_, optIdx) => {
+                    const label = document.querySelector(`label[for="p1_q${q.id}_o${optIdx}"]`);
+                    if (label) {
+                        label.classList.remove('correct-bg', 'wrong-bg');
+                        if (optIdx === q.correct) {
+                            label.classList.add('correct-bg');
+                        }
+                    }
+                });
+            });
+
+            showSol = false;
+            toggleSolutions();
+            calculateScore();
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+            document.querySelectorAll('.solution-box').forEach(b => b.classList.add('hidden'));
+            document.querySelectorAll('label').forEach(l => l.classList.remove('correct-bg', 'wrong-bg'));
+            showSol = false;
+            document.getElementById('btn-toggle-sol').innerHTML = `<i class="fa-regular fa-eye"></i> Hiện Lời Giải Chi Tiết`;
+            calculateScore();
+        }
+
+        window.onload = function() {
+            renderAll();
+        };
+    </script>
+</body>
+</html>
